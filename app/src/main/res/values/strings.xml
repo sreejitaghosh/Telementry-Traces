@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">Telemetry_Traces</string>
+    <string-array name="Sensors">
+        <item>Select</item>
+        <item>Scalar Sensor</item>
+        <item>Vector Sensor</item>
+    </string-array>
+
+    <string-array name="ScalarSensor">
+        <item>Select</item>
+        <item>Light Sensor</item>
+        <item>Proximity Sensor</item>
+    </string-array>
+
+    <string-array name="VectorSensor">
+        <item>Select</item>
+        <item>Gyroscope</item>
+        <item>Linear Accelaration</item>
+    </string-array>
+</resources>

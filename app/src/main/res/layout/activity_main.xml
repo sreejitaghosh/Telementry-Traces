@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    tools:context=".MainActivity"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/TimerTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:padding="10dp"
+        android:text="Timer : 00:00:00"
+        android:textSize="18sp"
+        android:textAlignment="center"
+        android:gravity="center_horizontal" />
+
+    <Button
+        android:id="@+id/StartStopButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/TimerTextView"
+        android:layout_margin="5dp"
+        android:text="Start"
+        android:layout_centerHorizontal="true" />
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/StartStopButton"
+        android:layout_centerHorizontal="true"
+        android:layout_margin="5dp" >
+
+        <TextView
+            android:id="@+id/TextView1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="Sensor Type : "
+            android:padding="5dp"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="#ffffff" />
+
+        <Spinner
+            android:id="@+id/SensorType"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/TextView1"
+            android:padding="5dp"
+            android:entries="@array/Sensors" />
+
+        <TextView
+            android:id="@+id/TextView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/TextView1"
+            android:hint="Sensor : "
+            android:padding="5dp"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="#ffffff" />
+
+        <Spinner
+            android:id="@+id/ScalarSensor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/SensorType"
+            android:layout_toRightOf="@id/TextView2"
+            android:layout_margin="0dp"
+            android:padding="5dp"
+            android:entries="@array/ScalarSensor" />
+
+        <Spinner
+            android:id="@+id/VectorSensor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/SensorType"
+            android:layout_toRightOf="@id/TextView2"
+            android:layout_margin="0dp"
+            android:padding="5dp"
+            android:entries="@array/VectorSensor"/>
+
+    </RelativeLayout>
+
+
+
+</RelativeLayout>
