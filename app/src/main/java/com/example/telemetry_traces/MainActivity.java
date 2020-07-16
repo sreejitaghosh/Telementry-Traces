@@ -38,7 +38,10 @@ public class MainActivity extends AppCompatActivity
     private int SecondsValue;
 
     static Map<Integer,String> TimeRepresentedBySeconds = new HashMap<>(); // This HashMap will contain data like {(0=01:10:10),(1=01:10:11),(2=01:10:12),(3=01:10:13),(4=01:10:14)}. This will remain same for all sensors.
-    static Map<String, ArrayList<Float>> TimeData = new HashMap<String, ArrayList<Float>>(); // This HashMap will contain data like {(01:10:11=[124,200,430,590]),(01:10:12=[546,287,139,234]) & so on}
+    static Map<String, ArrayList<Float>> TimeData1 = new HashMap<String, ArrayList<Float>>(); // This HashMap will contain data for scalar sensors.
+    static Map<String, ArrayList<Float>> TimeData2X = new HashMap<String, ArrayList<Float>>(); // This HashMap will contain data of X-Axis for vector sensors.
+    static Map<String, ArrayList<Float>> TimeData2Y = new HashMap<String, ArrayList<Float>>(); // This HashMap will contain data of Y-Axis for vector sensors.
+    static Map<String, ArrayList<Float>> TimeData2Z = new HashMap<String, ArrayList<Float>>(); // This HashMap will contain data of Z-Axis for vector sensors.
 
     static Spinner SensorType, ScalarSensor, VectorSensor;
 
@@ -91,11 +94,8 @@ public class MainActivity extends AppCompatActivity
                     VectorSensor.setVisibility(View.INVISIBLE);
                 }
             }
-
             @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
+            public void onNothingSelected(AdapterView<?> parent){}
         });
 
         StartStopButton.setOnClickListener(new View.OnClickListener() {
@@ -118,6 +118,8 @@ public class MainActivity extends AppCompatActivity
                         // Below code will run when user selects Light sensor from front end.
                         if(SensorType.getSelectedItemPosition() == 1 && ScalarSensor.getSelectedItemPosition() == 1)
                         {
+                            TimeRepresentedBySeconds.clear();
+                            TimeData1.clear();
                             try
                             {
                                 SimpleDateFormat SDF = new SimpleDateFormat("hh:mm:ss"); // Making format I need for time.
@@ -134,45 +136,15 @@ public class MainActivity extends AppCompatActivity
                                 @Override
                                 public void onSensorChanged(SensorEvent event)
                                 {
-                                    List<Sensor> ActiveSensor = SM.getSensorList(Sensor.TYPE_LIGHT); // Creating Sensor Active Status.
+                                    List<Sensor> ActiveSensor = SM.getSensorList(Sensor.TYPE_LIGHT); // Checking active sensor status.
                                     NowActive[0] = ActiveSensor.get(0);
+                                    System.out.println("New value for light sensor : " + event.values[0]);
                                     if (event.values[0] <= 600) // Limiting light sensor values to 600 LUX.
                                     {
                                         // I am keeping below line first to avoid as much delay as I can in getting time with sensor value.
                                         TimeNow = new SimpleDateFormat("hh:mm:ss", Locale.getDefault()).format(new Date()); // Getting system time again.
-                                        try // Trying to catch exception.
-                                        {
-                                            SimpleDateFormat SDF = new SimpleDateFormat("hh:mm:ss"); // Making format I need for time.
-                                            Time2=SDF.parse(TimeNow); // Converting time into required format.
-                                            Difference = (((Time2.getTime() - Time1.getTime())/1000)%24)%5; // Calculating time difference.
-                                            // System.out.println("Difference : "+Difference);
-                                            // System.out.println("Light Sensor: " + event.values[0] + " LUX");
-                                            SecondsValue = Math.round(Difference); // Converting difference value in integer.
-                                            if(!TimeRepresentedBySeconds.containsValue(TimeNow)) // If there are no value for given time, do as below.
-                                            {
-                                                String Mid = TimeRepresentedBySeconds.get(SecondsValue); // Fetching data of Key = SecondsValue from HashMap.
-                                                if(TimeData.containsKey(Mid)) // If HashMap (TimeData) contains any value of time stored in above Key = SecondsValue, do as below.
-                                                {
-                                                    TimeData.remove(Mid); // Remove all entries for above if condition.
-                                                }
-                                                TimeRepresentedBySeconds.put(SecondsValue,TimeNow); // Add new entry in HashMap for given time.
-                                                ArrayList<Float> LightSensorData = new ArrayList<Float>(); // This will contain light sensor data.
-                                                LightSensorData.add(event.values[0]); // Add new entry in ArrayList for Light Sensor value.
-                                                TimeData.put(TimeNow,LightSensorData); // Add new entry in HashMap for time and light sensor combination.
-                                            }
-                                            else // If there are values for given time in HashMap, do as below.
-                                            {
-                                                ArrayList<Float> LightSensorData = TimeData.get(TimeNow); // Fetching already created list from HashMap.
-                                                LightSensorData.add(event.values[0]); // Add new entry in ArrayList for Light Sensor value.
-                                                TimeData.put(TimeNow,LightSensorData); // Update new entry in HashMap for time and light sensor combination.
-                                            }
-                                            // System.out.println("TimeRepresentedBySeconds : "+TimeRepresentedBySeconds.entrySet());
-                                            // System.out.println("TimeData : "+TimeData.entrySet());
-                                        }
-                                        catch(Exception e) // Catching exception if any occurs.
-                                        {
-                                            e.printStackTrace(); // Printing occurred exception or error.
-                                        }
+                                        // In below statement, I am passing 1 to indicate Scalar Sensor, passing light sensor value, 0.0f & 0.0f as there are no y-axis and z-axis values here.
+                                        FillDataInDataStructures(1,event.values[0],0.0f,0.0f);
                                     }
                                 }
                                 @Override
@@ -183,51 +155,114 @@ public class MainActivity extends AppCompatActivity
                         // Below code will run when user selects Proximity sensor from front end.
                         else if(SensorType.getSelectedItemPosition() == 1 && ScalarSensor.getSelectedItemPosition() == 2)
                         {
-                            // add in a sensor listener for the proximity sensor
-                            SM.registerListener(SEL2[0] = new SensorEventListener() {
+                            TimeRepresentedBySeconds.clear();
+                            TimeData1.clear();
+                            try
+                            {
+                                SimpleDateFormat SDF = new SimpleDateFormat("hh:mm:ss"); // Making format I need for time.
+                                TimeNow = new SimpleDateFormat("hh:mm:ss", Locale.getDefault()).format(new Date()); // Take current system time.
+                                Time1=SDF.parse(TimeNow); // Converting time format as required.
+                            }
+                            catch(Exception e) // Catching exception if any occurs.
+                            {
+                                e.printStackTrace(); // Printing occurred exception or error.
+                            }
+                            SM.registerListener(SEL2[0] = new SensorEventListener() // Adding a sensor listener for the proximity sensor
+                            {
                                 @Override
-                                public void onSensorChanged(SensorEvent event) {
+                                public void onSensorChanged(SensorEvent event)
+                                {
                                     List<Sensor> ActiveSensor = SM.getSensorList(Sensor.TYPE_PROXIMITY);
                                     NowActive[0] = ActiveSensor.get(0);
-                                    System.out.println("Proximity Sensor: " + event.values[0] + "cm");
+                                    System.out.println("New value for proximity sensor : " + event.values[0]);
+                                    if (event.values[0] <= 20) // Limiting proximity sensor values to 20 Cms.
+                                    {
+                                        // I am keeping below line first to avoid as much delay as I can in getting time with sensor value.
+                                        TimeNow = new SimpleDateFormat("hh:mm:ss", Locale.getDefault()).format(new Date()); // Getting system time again.
+                                        // In below statement, I am passing 1 to indicate Scalar Sensor, passing proximity sensor value, 0.0f & 0.0f as there are no y-axis and z-axis values here.
+                                        FillDataInDataStructures(1,event.values[0],0.0f,0.0f);
+                                    }
                                 }
                                 @Override
                                 public void onAccuracyChanged(Sensor sensor, int accuracy){}
                             },  SM.getDefaultSensor(Sensor.TYPE_PROXIMITY), SensorManager.SENSOR_DELAY_UI);
                         }
 
-                        // Vector Sensor
+                        // Below code will run when user selects Gyroscope sensor from front end.
                         if(SensorType.getSelectedItemPosition() == 2 && VectorSensor.getSelectedItemPosition() == 1)
                         {
-                            // add in a sensor listener for the gyroscope
-                            SM.registerListener(SEL3[0] = new SensorEventListener() {
+                            TimeRepresentedBySeconds.clear();
+                            TimeData2X.clear();
+                            TimeData2Y.clear();
+                            TimeData2Z.clear();
+                            try
+                            {
+                                SimpleDateFormat SDF = new SimpleDateFormat("hh:mm:ss"); // Making format I need for time.
+                                TimeNow = new SimpleDateFormat("hh:mm:ss", Locale.getDefault()).format(new Date()); // Take current system time.
+                                Time1=SDF.parse(TimeNow); // Converting time format as required.
+                            }
+                            catch(Exception e) // Catching exception if any occurs.
+                            {
+                                e.printStackTrace(); // Printing occurred exception or error.
+                            }
+                            SM.registerListener(SEL3[0] = new SensorEventListener() // Adding a sensor listener for the gyroscope sensor.
+                            {
                                 @Override
                                 public void onSensorChanged(SensorEvent event)
                                 {
                                     List<Sensor> ActiveSensor = SM.getSensorList(Sensor.TYPE_GYROSCOPE);
                                     NowActive[0] = ActiveSensor.get(0);
-                                    System.out.println("gyroscope (rad/s) \n x: " + event.values[0] + " y: " + event.values[1] + " z: " + event.values[2]);
+                                    System.out.println("New value for gyroscope sensor X: " + event.values[0] + " Y: " + event.values[1] + " Z: " + event.values[2]);
+                                    // In below if condition, I am limiting gyroscope sensor values to 1G positive or negative.
+                                    if((Float.compare(event.values[0],-1)>0 && Float.compare(event.values[0],1)<0) && (Float.compare(event.values[1],-1)>0 && Float.compare(event.values[1],1)<0) && (Float.compare(event.values[2],-1)>0 && Float.compare(event.values[2],1)<0))
+                                    {
+                                        // I am keeping below line first to avoid as much delay as I can in getting time with sensor value.
+                                        TimeNow = new SimpleDateFormat("hh:mm:ss", Locale.getDefault()).format(new Date()); // Getting system time again.
+                                        // In below statement, I am passing 2 to indicate Vector Sensor, passing sensor's x-axis value, passing sensor's y-axis value &  finally passing sensor's z-axis value.
+                                        FillDataInDataStructures(2,event.values[0],event.values[1],event.values[2]);
+                                    }
                                 }
                                 @Override
-                                public void onAccuracyChanged(Sensor sensor, int accuracy) {
-                                }
-                            }, SM.getDefaultSensor(Sensor.TYPE_GYROSCOPE), SensorManager.SENSOR_DELAY_UI);
+                                public void onAccuracyChanged(Sensor sensor, int accuracy){}
+                            }, SM.getDefaultSensor(Sensor.TYPE_GYROSCOPE), SensorManager.SENSOR_DELAY_NORMAL);
                         }
+
                         // Below code will run when user selects Linear Acceleration from front end.
                         else if(SensorType.getSelectedItemPosition() == 2 && VectorSensor.getSelectedItemPosition() == 2)
                         {
-                            // add in a sensor listener for the Linear Acceleration
-                            SM.registerListener(SEL4[0] = new SensorEventListener() {
+                            TimeRepresentedBySeconds.clear();
+                            TimeData2X.clear();
+                            TimeData2Y.clear();
+                            TimeData2Z.clear();
+                            try
+                            {
+                                SimpleDateFormat SDF = new SimpleDateFormat("hh:mm:ss"); // Making format I need for time.
+                                TimeNow = new SimpleDateFormat("hh:mm:ss", Locale.getDefault()).format(new Date()); // Take current system time.
+                                Time1=SDF.parse(TimeNow); // Converting time format as required.
+                            }
+                            catch(Exception e) // Catching exception if any occurs.
+                            {
+                                e.printStackTrace(); // Printing occurred exception or error.
+                            }
+                            SM.registerListener(SEL4[0] = new SensorEventListener() // Adding a sensor listener for the Linear Acceleration sensor.
+                            {
                                 @Override
-                                public void onSensorChanged(SensorEvent event) {
+                                public void onSensorChanged(SensorEvent event)
+                                {
                                     List<Sensor> ActiveSensor = SM.getSensorList(Sensor.TYPE_LINEAR_ACCELERATION);
                                     NowActive[0] = ActiveSensor.get(0);
-                                    System.out.println("linear acceleration (ms-2) \n x: " + event.values[0] + " y: " + event.values[1] + " z: " + event.values[2]);
-
+                                    System.out.println("New value for linear acceleration (MS-2) X: " + event.values[0] + " Y: " + event.values[1] + " Z: " + event.values[2]);
+                                    // In below if condition, I am limiting linear acceleration sensor values to 2 rads/s positive or negative.
+                                    if((Float.compare(event.values[0],-2)>0 && Float.compare(event.values[0],2)<0) && (Float.compare(event.values[1],-2)>0 && Float.compare(event.values[1],2)<0) && (Float.compare(event.values[2],-2)>0 && Float.compare(event.values[2],2)<0))
+                                    {
+                                        // I am keeping below line first to avoid as much delay as I can in getting time with sensor value.
+                                        TimeNow = new SimpleDateFormat("hh:mm:ss", Locale.getDefault()).format(new Date()); // Getting system time again.
+                                        // In below statement, I am passing 2 to indicate Vector Sensor, passing sensor's x-axis value, passing sensor's y-axis value &  finally passing sensor's z-axis value.
+                                        FillDataInDataStructures(2,event.values[0],event.values[1],event.values[2]);
+                                    }
                                 }
                                 @Override
-                                public void onAccuracyChanged(Sensor sensor, int accuracy) {
-                                }
+                                public void onAccuracyChanged(Sensor sensor, int accuracy){}
                             },  SM.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION), SensorManager.SENSOR_DELAY_NORMAL);
                         }
                     }
@@ -294,5 +329,88 @@ public class MainActivity extends AppCompatActivity
         }
         else // If appropriate sensor type is not selected, do as below.
             return 0; // Return 0.
+    }
+
+    // Below function is responsible to fill in all required data in global variables of sensors.
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private void FillDataInDataStructures(int SensorType, Float SensorXValue, Float SensorYValue, Float SensorZValue)
+    {
+        try // Trying to catch exception.
+        {
+            SimpleDateFormat SDF = new SimpleDateFormat("hh:mm:ss"); // Making format I need for time.
+            Time2=SDF.parse(TimeNow); // Converting time into required format.
+            Difference = (((Time2.getTime() - Time1.getTime())/1000)%24)%5; // Calculating time difference.
+            SecondsValue = Math.round(Difference); // Converting difference value in integer.
+            if(!TimeRepresentedBySeconds.containsValue(TimeNow)) // If there are no value for given time, do as below.
+            {
+                String Temp = TimeRepresentedBySeconds.get(SecondsValue); // Fetching data of Key = SecondsValue from HashMap.
+                if(SensorType == 1) // If sensor is a scalar sensor.
+                {
+                    if (TimeData1.containsKey(Temp)) // If HashMap (TimeData) contains any value of time stored in above Key = SecondsValue, do as below.
+                    {
+                        TimeData1.remove(Temp); // Remove all entries for above if condition.
+                    }
+                    TimeRepresentedBySeconds.put(SecondsValue, TimeNow); // Add new entry in HashMap for given time.
+                    ArrayList<Float> SensorData = new ArrayList<Float>(); // This will contain sensor data.
+                    SensorData.add(SensorXValue); // Add new entry in ArrayList for Sensor value.
+                    TimeData1.put(TimeNow, SensorData); // Add new entry in HashMap for time and sensor combination.
+                }
+                else if(SensorType == 2) // If sensor is a vector sensor.
+                {
+                    if (TimeData2X.containsKey(Temp) && TimeData2Y.containsKey(Temp) && TimeData2Z.containsKey(Temp)) // If HashMap (TimeData) contains any value of time stored in above Key = SecondsValue, do as below.
+                    {
+                        TimeData2X.remove(Temp); // Remove all entries from sensor x-axis array for above if condition.
+                        TimeData2Y.remove(Temp); // Remove all entries from sensor y-axis array for above if condition.
+                        TimeData2Z.remove(Temp); // Remove all entries from sensor z-axis array for above if condition.
+                    }
+                    TimeRepresentedBySeconds.put(SecondsValue, TimeNow); // Add new entry in HashMap for given time.
+                    ArrayList<Float> SensorData1 = new ArrayList<Float>(); // This will contain sensor data for x-axis.
+                    ArrayList<Float> SensorData2 = new ArrayList<Float>(); // This will contain sensor data for y-axis.
+                    ArrayList<Float> SensorData3 = new ArrayList<Float>(); // This will contain sensor data for z-axis.
+                    SensorData1.add(SensorXValue); // Add new entry in ArrayList of x-axis for sensor value.
+                    SensorData2.add(SensorYValue); // Add new entry in ArrayList of y-axis for sensor value.
+                    SensorData3.add(SensorZValue); // Add new entry in ArrayList of z-axis for sensor value.
+                    TimeData2X.put(TimeNow, SensorData1); // Add new entry in HashMap for time and sensor x-axis combination.
+                    TimeData2Y.put(TimeNow, SensorData2); // Add new entry in HashMap for time and sensor y-axis combination.
+                    TimeData2Z.put(TimeNow, SensorData3); // Add new entry in HashMap for time and sensor z-axis combination.
+                }
+            }
+            else if(TimeRepresentedBySeconds.containsValue(TimeNow)) // If there are values for given time in HashMap, do as below.
+            {
+                if(SensorType == 1) // If sensor is a scalar sensor.
+                {
+                    ArrayList<Float> SensorData = TimeData1.get(TimeNow); // Fetching already created list from ArrayList.
+                    SensorData.add(SensorXValue); // Add new entry in ArrayList for Sensor value.
+                    TimeData1.put(TimeNow, SensorData); // Update new entry in HashMap for time and sensor combination.
+                }
+                else if(SensorType == 2) // If sensor is a vector sensor.
+                {
+                    ArrayList<Float> SensorData1 = TimeData2X.get(TimeNow); // Fetching already created list from ArrayList for x-axis.
+                    ArrayList<Float> SensorData2 = TimeData2Y.get(TimeNow); // Fetching already created list from ArrayList for y-axis.
+                    ArrayList<Float> SensorData3 = TimeData2Z.get(TimeNow); // Fetching already created list from ArrayList for z-axis.
+                    SensorData1.add(SensorXValue); // Add new entry in ArrayList of x-axis for sensor value.
+                    SensorData2.add(SensorYValue); // Add new entry in ArrayList of y-axis for sensor value.
+                    SensorData3.add(SensorZValue); // Add new entry in ArrayList of z-axis for sensor value.
+                    TimeData2X.put(TimeNow, SensorData1); // Add new entry in HashMap for time and sensor x-axis combination.
+                    TimeData2Y.put(TimeNow, SensorData2); // Add new entry in HashMap for time and sensor y-axis combination.
+                    TimeData2Z.put(TimeNow, SensorData3); // Add new entry in HashMap for time and sensor z-axis combination.
+                }
+            }
+            System.out.println("TimeRepresentedBySeconds : " + TimeRepresentedBySeconds.entrySet());
+            if(SensorType == 1) // If sensor is a scalar sensor.
+            {
+                System.out.println("TimeData1 (Light or Proximity Sensor Data) : " + TimeData1.entrySet());
+            }
+            else if(SensorType == 2) // If sensor is a vector sensor.
+            {
+                System.out.println("X-Axis (Gyroscope or Linear Acceleration Sensor Data) : " + TimeData2X.entrySet());
+                System.out.println("Y-Axis (Gyroscope or Linear Acceleration Sensor Data) : " + TimeData2Y.entrySet());
+                System.out.println("Z-Axis (Gyroscope or Linear Acceleration Sensor Data) : " + TimeData2Z.entrySet());
+            }
+        }
+        catch(Exception e) // Catching exception if any occurs.
+        {
+            e.printStackTrace(); // Printing occurred exception or error.
+        }
     }
 }
