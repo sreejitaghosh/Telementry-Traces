@@ -139,7 +139,7 @@ public class MainActivity extends AppCompatActivity
                                     List<Sensor> ActiveSensor = SM.getSensorList(Sensor.TYPE_LIGHT); // Checking active sensor status.
                                     NowActive[0] = ActiveSensor.get(0);
                                     System.out.println("New value for light sensor : " + event.values[0]);
-                                    if (event.values[0] <= 600) // Limiting light sensor values to 600 LUX.
+                                    if (Float.compare(event.values[0],600)<=0) // Limiting light sensor values to 600 LUX.
                                     {
                                         // I am keeping below line first to avoid as much delay as I can in getting time with sensor value.
                                         TimeNow = new SimpleDateFormat("hh:mm:ss", Locale.getDefault()).format(new Date()); // Getting system time again.
@@ -175,7 +175,7 @@ public class MainActivity extends AppCompatActivity
                                     List<Sensor> ActiveSensor = SM.getSensorList(Sensor.TYPE_PROXIMITY);
                                     NowActive[0] = ActiveSensor.get(0);
                                     System.out.println("New value for proximity sensor : " + event.values[0]);
-                                    if (event.values[0] <= 20) // Limiting proximity sensor values to 20 Cms.
+                                    if (Float.compare(event.values[0],20)<=0) // Limiting proximity sensor values to 20 Cms.
                                     {
                                         // I am keeping below line first to avoid as much delay as I can in getting time with sensor value.
                                         TimeNow = new SimpleDateFormat("hh:mm:ss", Locale.getDefault()).format(new Date()); // Getting system time again.
