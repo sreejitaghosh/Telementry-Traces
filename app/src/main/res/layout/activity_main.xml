@@ -87,6 +87,45 @@
 
     </RelativeLayout>
 
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/Relative_Layout2" >
+
+    <TextView
+        android:id="@+id/Live"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:text="Live Values : " />
+
+    <TextView
+        android:id="@+id/XValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="X Value"
+        android:padding="5dp"
+        android:layout_toRightOf="@id/Live" />
+
+    <TextView
+        android:id="@+id/YValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Y Value"
+        android:padding="5dp"
+        android:layout_toRightOf="@+id/XValue" />
+
+    <TextView
+        android:id="@+id/ZValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Z Value"
+        android:padding="5dp"
+        android:layout_toRightOf="@+id/YValue" />
+
+    </RelativeLayout>
+
     <com.example.telemetry_traces.CustomView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

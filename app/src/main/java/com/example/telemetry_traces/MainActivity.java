@@ -1,7 +1,5 @@
 package com.example.telemetry_traces;
 
-import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AppCompatActivity;
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -17,6 +15,8 @@ import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatActivity;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -28,6 +28,7 @@ public class MainActivity extends AppCompatActivity
 {
     private TextView TV2;
     private TextView Timer;
+    private TextView X,Y,Z;
     private long TimeStart = 0;
     private Handler TimeHandler = new Handler();
     private Runnable run;
@@ -49,9 +50,10 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Timer = findViewById(R.id.TimerTextView);
-        Button StartStopButton = findViewById(R.id.StartStopButton);
 
+        Button StartStopButton = findViewById(R.id.StartStopButton);
+        StartStopButton.setText("START");
+        Timer = findViewById(R.id.TimerTextView);
         SensorType = (Spinner) findViewById(R.id.SensorType);
         ScalarSensor = (Spinner) findViewById(R.id.ScalarSensor);
         VectorSensor = (Spinner) findViewById(R.id.VectorSensor);
@@ -61,12 +63,9 @@ public class MainActivity extends AppCompatActivity
         final SensorEventListener[] SEL2 = new SensorEventListener[1];
         final SensorEventListener[] SEL3 = new SensorEventListener[1];
         final SensorEventListener[] SEL4 = new SensorEventListener[1];
-
-        StartStopButton.setText("START");
         ScalarSensor.setVisibility(View.INVISIBLE);
         VectorSensor.setVisibility(View.INVISIBLE);
         TV2.setVisibility(View.INVISIBLE);
-
         SensorType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
         {
             @Override
@@ -214,7 +213,7 @@ public class MainActivity extends AppCompatActivity
                                     NowActive[0] = ActiveSensor.get(0);
                                     System.out.println("New value for gyroscope sensor X: " + event.values[0] + " Y: " + event.values[1] + " Z: " + event.values[2]);
                                     // In below if condition, I am limiting gyroscope sensor values to 1G positive or negative.
-                                    if((Float.compare(event.values[0],-1)>0 && Float.compare(event.values[0],1)<0) && (Float.compare(event.values[1],-1)>0 && Float.compare(event.values[1],1)<0) && (Float.compare(event.values[2],-1)>0 && Float.compare(event.values[2],1)<0))
+                                    if((Float.compare(event.values[0],-2)>0 && Float.compare(event.values[0],2)<0) && (Float.compare(event.values[1],-2)>0 && Float.compare(event.values[1],2)<0) && (Float.compare(event.values[2],-2)>0 && Float.compare(event.values[2],2)<0))
                                     {
                                         // I am keeping below line first to avoid as much delay as I can in getting time with sensor value.
                                         TimeNow = new SimpleDateFormat("hh:mm:ss", Locale.getDefault()).format(new Date()); // Getting system time again.
@@ -253,7 +252,7 @@ public class MainActivity extends AppCompatActivity
                                     NowActive[0] = ActiveSensor.get(0);
                                     System.out.println("New value for linear acceleration (MS-2) X: " + event.values[0] + " Y: " + event.values[1] + " Z: " + event.values[2]);
                                     // In below if condition, I am limiting linear acceleration sensor values to 2 rads/s positive or negative.
-                                    if((Float.compare(event.values[0],-2)>0 && Float.compare(event.values[0],2)<0) && (Float.compare(event.values[1],-2)>0 && Float.compare(event.values[1],2)<0) && (Float.compare(event.values[2],-2)>0 && Float.compare(event.values[2],2)<0))
+                                    if((Float.compare(event.values[0],-1)>0 && Float.compare(event.values[0],1)<0) && (Float.compare(event.values[1],-1)>0 && Float.compare(event.values[1],1)<0) && (Float.compare(event.values[2],-1)>0 && Float.compare(event.values[2],1)<0))
                                     {
                                         // I am keeping below line first to avoid as much delay as I can in getting time with sensor value.
                                         TimeNow = new SimpleDateFormat("hh:mm:ss", Locale.getDefault()).format(new Date()); // Getting system time again.
@@ -271,6 +270,12 @@ public class MainActivity extends AppCompatActivity
                         TimeHandler.removeCallbacks(run);
                         button.setText("START");
                         Timer.setText("Timer : 00:00:00");
+                        X = findViewById(R.id.XValue);
+                        Y = findViewById(R.id.YValue);
+                        Z = findViewById(R.id.ZValue);
+                        X.setText("X Value");
+                        Y.setText("Y Value");
+                        Z.setText("Z Value");
                         if(SensorType.getSelectedItemPosition() == 1 && ScalarSensor.getSelectedItemPosition() == 1)
                         {
                             SM.unregisterListener(SEL1[0], NowActive[0]);
@@ -292,6 +297,11 @@ public class MainActivity extends AppCompatActivity
                             VectorSensor.setSelection(0);
                         }
                         SensorType.setSelection(0);
+                        TimeRepresentedBySeconds.clear();
+                        TimeData1.clear();
+                        TimeData2X.clear();
+                        TimeData2Y.clear();
+                        TimeData2Z.clear();
                         Toast.makeText(MainActivity.this, "Tracing has been stopped.", Toast.LENGTH_LONG).show();
                     }
                 }
@@ -333,18 +343,33 @@ public class MainActivity extends AppCompatActivity
 
     // Below function is responsible to fill in all required data in global variables of sensors.
     @RequiresApi(api = Build.VERSION_CODES.N)
-    private void FillDataInDataStructures(int SensorType, Float SensorXValue, Float SensorYValue, Float SensorZValue)
-    {
+    private void FillDataInDataStructures(int SensorType, Float SensorXValue, Float SensorYValue, Float SensorZValue) {
         try // Trying to catch exception.
         {
+            SensorXValue = Float.parseFloat(String.format("%.3f",SensorXValue));
+            SensorYValue = Float.parseFloat(String.format("%.3f",SensorYValue));
+            SensorZValue = Float.parseFloat(String.format("%.3f",SensorZValue));
+            X = findViewById(R.id.XValue);
+            Y = findViewById(R.id.YValue);
+            Z = findViewById(R.id.ZValue);
+            if(SensorType == 1)
+            {
+                Y.setText("Y : " + SensorXValue);
+            }
+            else if(SensorType == 2)
+            {
+                X.setText("X : " + SensorXValue);
+                Y.setText("Y : " + SensorYValue);
+                Z.setText("Z : " + SensorZValue);
+            }
             SimpleDateFormat SDF = new SimpleDateFormat("hh:mm:ss"); // Making format I need for time.
-            Time2=SDF.parse(TimeNow); // Converting time into required format.
-            Difference = (((Time2.getTime() - Time1.getTime())/1000)%24)%5; // Calculating time difference.
+            Time2 = SDF.parse(TimeNow); // Converting time into required format.
+            Difference = (((Time2.getTime() - Time1.getTime()) / 1000) % 24) % 5; // Calculating time difference.
             SecondsValue = Math.round(Difference); // Converting difference value in integer.
-            if(!TimeRepresentedBySeconds.containsValue(TimeNow)) // If there are no value for given time, do as below.
+            if (!TimeRepresentedBySeconds.containsValue(TimeNow)) // If there are no value for given time, do as below.
             {
                 String Temp = TimeRepresentedBySeconds.get(SecondsValue); // Fetching data of Key = SecondsValue from HashMap.
-                if(SensorType == 1) // If sensor is a scalar sensor.
+                if (SensorType == 1) // If sensor is a scalar sensor.
                 {
                     if (TimeData1.containsKey(Temp)) // If HashMap (TimeData) contains any value of time stored in above Key = SecondsValue, do as below.
                     {
@@ -354,8 +379,7 @@ public class MainActivity extends AppCompatActivity
                     ArrayList<Float> SensorData = new ArrayList<Float>(); // This will contain sensor data.
                     SensorData.add(SensorXValue); // Add new entry in ArrayList for Sensor value.
                     TimeData1.put(TimeNow, SensorData); // Add new entry in HashMap for time and sensor combination.
-                }
-                else if(SensorType == 2) // If sensor is a vector sensor.
+                } else if (SensorType == 2) // If sensor is a vector sensor.
                 {
                     if (TimeData2X.containsKey(Temp) && TimeData2Y.containsKey(Temp) && TimeData2Z.containsKey(Temp)) // If HashMap (TimeData) contains any value of time stored in above Key = SecondsValue, do as below.
                     {
@@ -375,15 +399,14 @@ public class MainActivity extends AppCompatActivity
                     TimeData2Z.put(TimeNow, SensorData3); // Add new entry in HashMap for time and sensor z-axis combination.
                 }
             }
-            else if(TimeRepresentedBySeconds.containsValue(TimeNow)) // If there are values for given time in HashMap, do as below.
+            else if (TimeRepresentedBySeconds.containsValue(TimeNow)) // If there are values for given time in HashMap, do as below.
             {
-                if(SensorType == 1) // If sensor is a scalar sensor.
+                if (SensorType == 1) // If sensor is a scalar sensor.
                 {
                     ArrayList<Float> SensorData = TimeData1.get(TimeNow); // Fetching already created list from ArrayList.
                     SensorData.add(SensorXValue); // Add new entry in ArrayList for Sensor value.
                     TimeData1.put(TimeNow, SensorData); // Update new entry in HashMap for time and sensor combination.
-                }
-                else if(SensorType == 2) // If sensor is a vector sensor.
+                } else if (SensorType == 2) // If sensor is a vector sensor.
                 {
                     ArrayList<Float> SensorData1 = TimeData2X.get(TimeNow); // Fetching already created list from ArrayList for x-axis.
                     ArrayList<Float> SensorData2 = TimeData2Y.get(TimeNow); // Fetching already created list from ArrayList for y-axis.
@@ -397,18 +420,16 @@ public class MainActivity extends AppCompatActivity
                 }
             }
             System.out.println("TimeRepresentedBySeconds : " + TimeRepresentedBySeconds.entrySet());
-            if(SensorType == 1) // If sensor is a scalar sensor.
+            if (SensorType == 1) // If sensor is a scalar sensor.
             {
                 System.out.println("TimeData1 (Light or Proximity Sensor Data) : " + TimeData1.entrySet());
-            }
-            else if(SensorType == 2) // If sensor is a vector sensor.
+            } else if (SensorType == 2) // If sensor is a vector sensor.
             {
                 System.out.println("X-Axis (Gyroscope or Linear Acceleration Sensor Data) : " + TimeData2X.entrySet());
                 System.out.println("Y-Axis (Gyroscope or Linear Acceleration Sensor Data) : " + TimeData2Y.entrySet());
                 System.out.println("Z-Axis (Gyroscope or Linear Acceleration Sensor Data) : " + TimeData2Z.entrySet());
             }
-        }
-        catch(Exception e) // Catching exception if any occurs.
+        } catch (Exception e) // Catching exception if any occurs.
         {
             e.printStackTrace(); // Printing occurred exception or error.
         }
