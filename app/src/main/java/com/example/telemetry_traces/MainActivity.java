@@ -1,6 +1,7 @@
 package com.example.telemetry_traces;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -26,6 +27,7 @@ import java.util.Map;
 
 public class MainActivity extends AppCompatActivity
 {
+    private TextView TV1;
     private TextView TV2;
     private TextView Timer;
     private TextView X,Y,Z;
@@ -51,35 +53,36 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Button StartStopButton = findViewById(R.id.StartStopButton);
+        final Button StartStopButton = findViewById(R.id.StartStopButton);
         StartStopButton.setText("START");
         Timer = findViewById(R.id.TimerTextView);
         SensorType = (Spinner) findViewById(R.id.SensorType);
         ScalarSensor = (Spinner) findViewById(R.id.ScalarSensor);
         VectorSensor = (Spinner) findViewById(R.id.VectorSensor);
+        TV1 = (TextView) findViewById(R.id.SensorType_TV);
         TV2 = (TextView) findViewById(R.id.TextView2);
         final Sensor[] NowActive = {null};
         final SensorEventListener[] SEL1 = new SensorEventListener[1];
         final SensorEventListener[] SEL2 = new SensorEventListener[1];
         final SensorEventListener[] SEL3 = new SensorEventListener[1];
         final SensorEventListener[] SEL4 = new SensorEventListener[1];
-        ScalarSensor.setVisibility(View.INVISIBLE);
-        VectorSensor.setVisibility(View.INVISIBLE);
-        TV2.setVisibility(View.INVISIBLE);
+        ScalarSensor.setVisibility(View.INVISIBLE); // Initially Scalar sensor spinner will be disabled. This will be displayed once sensor type will be selected.
+        VectorSensor.setVisibility(View.INVISIBLE); // Initially Vector sensor spinner will be disabled. This will be displayed once sensor type will be selected.
+        TV2.setVisibility(View.INVISIBLE); // Text view will be disabled. This will show text against appropriate spinner of selecting sensor.
         SensorType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
         {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
             {
-                if(position != 0)
+                if (position != 0)
                 {
-                    if(position == 1)
+                    if (position == 1)
                     {
                         TV2.setVisibility(View.VISIBLE);
                         ScalarSensor.setVisibility(View.VISIBLE);
                         VectorSensor.setVisibility(View.INVISIBLE);
                     }
-                    else if(position == 2)
+                    else if (position == 2)
                     {
                         TV2.setVisibility(View.VISIBLE);
                         ScalarSensor.setVisibility(View.INVISIBLE);
@@ -113,10 +116,12 @@ public class MainActivity extends AppCompatActivity
                         Timer.setText("00:00:00");
                         button.setText("STOP");
                         SM = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+                        SensorType.setEnabled(false);
 
                         // Below code will run when user selects Light sensor from front end.
                         if(SensorType.getSelectedItemPosition() == 1 && ScalarSensor.getSelectedItemPosition() == 1)
                         {
+                            ScalarSensor.setEnabled(false);
                             TimeRepresentedBySeconds.clear();
                             TimeData1.clear();
                             try
@@ -154,6 +159,7 @@ public class MainActivity extends AppCompatActivity
                         // Below code will run when user selects Proximity sensor from front end.
                         else if(SensorType.getSelectedItemPosition() == 1 && ScalarSensor.getSelectedItemPosition() == 2)
                         {
+                            ScalarSensor.setEnabled(false);
                             TimeRepresentedBySeconds.clear();
                             TimeData1.clear();
                             try
@@ -190,6 +196,7 @@ public class MainActivity extends AppCompatActivity
                         // Below code will run when user selects Gyroscope sensor from front end.
                         if(SensorType.getSelectedItemPosition() == 2 && VectorSensor.getSelectedItemPosition() == 1)
                         {
+                            VectorSensor.setEnabled(false);
                             TimeRepresentedBySeconds.clear();
                             TimeData2X.clear();
                             TimeData2Y.clear();
@@ -229,6 +236,7 @@ public class MainActivity extends AppCompatActivity
                         // Below code will run when user selects Linear Acceleration from front end.
                         else if(SensorType.getSelectedItemPosition() == 2 && VectorSensor.getSelectedItemPosition() == 2)
                         {
+                            VectorSensor.setEnabled(false);
                             TimeRepresentedBySeconds.clear();
                             TimeData2X.clear();
                             TimeData2Y.clear();
@@ -274,26 +282,37 @@ public class MainActivity extends AppCompatActivity
                         Y = findViewById(R.id.YValue);
                         Z = findViewById(R.id.ZValue);
                         X.setText("X Value");
+                        X.setBackgroundColor(Color.TRANSPARENT);
+                        X.setTextColor(Color.BLACK);
                         Y.setText("Y Value");
+                        Y.setBackgroundColor(Color.TRANSPARENT);
+                        Y.setTextColor(Color.BLACK);
                         Z.setText("Z Value");
+                        Z.setBackgroundColor(Color.TRANSPARENT);
+                        Z.setTextColor(Color.BLACK);
+                        SensorType.setEnabled(true);
                         if(SensorType.getSelectedItemPosition() == 1 && ScalarSensor.getSelectedItemPosition() == 1)
                         {
                             SM.unregisterListener(SEL1[0], NowActive[0]);
+                            ScalarSensor.setEnabled(true);
                             ScalarSensor.setSelection(0);
                         }
                         else if (SensorType.getSelectedItemPosition() == 1 && ScalarSensor.getSelectedItemPosition() == 2)
                         {
                             SM.unregisterListener(SEL2[0], NowActive[0]);
+                            ScalarSensor.setEnabled(true);
                             ScalarSensor.setSelection(0);
                         }
                         else if(SensorType.getSelectedItemPosition() == 2 && VectorSensor.getSelectedItemPosition() == 1)
                         {
-                            SM.unregisterListener(SEL3[0],NowActive[0]);
+                            SM.unregisterListener(SEL3[0], NowActive[0]);
+                            VectorSensor.setEnabled(true);
                             VectorSensor.setSelection(0);
                         }
                         else if (SensorType.getSelectedItemPosition() == 2 && VectorSensor.getSelectedItemPosition() == 2)
                         {
-                            SM.unregisterListener(SEL4[0],NowActive[0]);
+                            SM.unregisterListener(SEL4[0], NowActive[0]);
+                            VectorSensor.setEnabled(true);
                             VectorSensor.setSelection(0);
                         }
                         SensorType.setSelection(0);
@@ -316,14 +335,14 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void run()
             {
-                long MilliSeconds = System.currentTimeMillis() - TimeStart;
-                int Seconds = (int)(MilliSeconds/1000);
-                int Minutes = Seconds/60;
-                Seconds = Seconds % 60;
-                int Hours = Minutes/60;
-                Minutes = Minutes % 60;
-                Timer.setText(String.format("Timer : "+"%02d:%02d:%02d",Hours,Minutes,Seconds));
-                TimeHandler.postDelayed(this,500);
+                long MilliSeconds = System.currentTimeMillis() - TimeStart; // Taking time in milliseconds and subtracting it from time start.
+                int Seconds = (int)(MilliSeconds/1000); // Defining milliseconds to seconds.
+                int Minutes = Seconds/60; // Defining seconds to minutes.
+                Seconds = Seconds % 60; // Converting to seconds.
+                int Hours = Minutes/60; // Defining minutes to hours.
+                Minutes = Minutes % 60; // Converting to hours.
+                Timer.setText(String.format("Timer : "+"%02d:%02d:%02d",Hours,Minutes,Seconds)); // Updating text of timer.
+                TimeHandler.postDelayed(this,500); // Delaying update in time by 0.5 seconds.
             }
         };
     }
@@ -346,21 +365,26 @@ public class MainActivity extends AppCompatActivity
     private void FillDataInDataStructures(int SensorType, Float SensorXValue, Float SensorYValue, Float SensorZValue) {
         try // Trying to catch exception.
         {
-            SensorXValue = Float.parseFloat(String.format("%.3f",SensorXValue));
-            SensorYValue = Float.parseFloat(String.format("%.3f",SensorYValue));
-            SensorZValue = Float.parseFloat(String.format("%.3f",SensorZValue));
-            X = findViewById(R.id.XValue);
-            Y = findViewById(R.id.YValue);
-            Z = findViewById(R.id.ZValue);
-            if(SensorType == 1)
+            SensorXValue = Float.parseFloat(String.format("%.3f",SensorXValue)); // Restricting values to 3 digits after decimal.
+            SensorYValue = Float.parseFloat(String.format("%.3f",SensorYValue)); // Restricting values to 3 digits after decimal.
+            SensorZValue = Float.parseFloat(String.format("%.3f",SensorZValue)); // Restricting values to 3 digits after decimal.
+            X = findViewById(R.id.XValue); // Displaying values on text view for x-axis.
+            Y = findViewById(R.id.YValue); // Displaying values on text view for x-axis.
+            Z = findViewById(R.id.ZValue); // Displaying values on text view for x-axis.
+            if(SensorType == 1) // If sensor type selected is scalar sensor, do as below.
             {
-                Y.setText("Y : " + SensorXValue);
+                Y.setText("Y : " + SensorXValue); // Display only y-axis values as there are no z-axis values and x-axis is time. There is timer to display time and hence, no need of displaying time on x-axis position.
             }
-            else if(SensorType == 2)
+            else if(SensorType == 2) // If sensor type selected is vector sensor, do as below.
             {
-                X.setText("X : " + SensorXValue);
-                Y.setText("Y : " + SensorYValue);
-                Z.setText("Z : " + SensorZValue);
+                X.setText("X : " + SensorXValue); // Display x-axis values in text view.
+                X.setBackgroundColor(Color.parseColor("#B90E0A")); // Defining background color.
+                X.setTextColor(Color.parseColor("#FFFFFF")); // Defining font color.
+                Y.setText("Y : " + SensorYValue); // Display y-axis values in text view.
+                Y.setBackgroundColor(Color.parseColor("#000000")); // Defining background color.
+                Y.setTextColor(Color.parseColor("#FFFFFF")); // Defining font color.
+                Z.setText("Z : " + SensorZValue); // Display z-axis values in text view.
+                Z.setBackgroundColor(Color.parseColor("#03C04A")); // Defining background color.
             }
             SimpleDateFormat SDF = new SimpleDateFormat("hh:mm:ss"); // Making format I need for time.
             Time2 = SDF.parse(TimeNow); // Converting time into required format.

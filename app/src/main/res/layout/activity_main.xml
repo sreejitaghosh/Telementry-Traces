@@ -37,7 +37,7 @@
         android:id="@+id/Relative_Layout2">
 
         <TextView
-            android:id="@+id/TextView1"
+            android:id="@+id/SensorType_TV"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:hint="Sensor Type : "
@@ -50,7 +50,7 @@
             android:id="@+id/SensorType"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@id/TextView1"
+            android:layout_toRightOf="@id/SensorType_TV"
             android:padding="5dp"
             android:entries="@array/Sensors" />
 
@@ -58,7 +58,7 @@
             android:id="@+id/TextView2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/TextView1"
+            android:layout_below="@+id/SensorType_TV"
             android:hint="Sensor : "
             android:padding="5dp"
             android:textSize="16sp"
