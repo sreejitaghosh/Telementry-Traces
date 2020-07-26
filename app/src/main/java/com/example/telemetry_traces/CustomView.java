@@ -83,11 +83,11 @@ public class CustomView extends View
         Color3.setColor(Color.GREEN); // This color will be given to one of the graph lines.
         Color3.setStrokeWidth(5);
         // Declaration of colors ends.
-        GraphOffset = getWidth()/14; // Setting Graph Offset. This will be used everywhere.
+        GraphOffset = canvas.getWidth()/14; // Setting Graph Offset. This will be used everywhere.
         SensorId = CheckSensor(); // Calling function to check which sensor is currently selected.
-        float XAxisFontYPosition = getHeight()-GraphOffset-20; // This is Y position of X-Axis fonts. This is for numbers on X-Axis.
-        float XAxisFontLabelXPosition = getWidth()/3; // This is X position of X-Axis Label fonts.
-        float XAxisFontLabelYPosition = getHeight()-GraphOffset/2; // This is Y position of X-Axis Label fonts.
+        float XAxisFontYPosition = canvas.getHeight()-GraphOffset-20; // This is Y position of X-Axis fonts. This is for numbers on X-Axis.
+        float XAxisFontLabelXPosition = canvas.getWidth()/3; // This is X position of X-Axis Label fonts.
+        float XAxisFontLabelYPosition = canvas.getHeight()-GraphOffset/2; // This is Y position of X-Axis Label fonts.
         if(SensorId != 0) // If sensor id is 0, i.e. if any one of given sensors are selected by user, do as below.
             canvas.drawText("Graph will be updated in every 5 seconds.",GraphOffset*3,GraphOffset*2,TextColor); // Display this message at given x and y positions of screen.
         if(SensorId == 1 || SensorId == 2) // In case scalar sensors are selected, graph will be different.
@@ -96,8 +96,8 @@ public class CustomView extends View
             int keycount = 0; // Initializing Key count to 0. We need Key count to define offset in each iteration. This will be used later.
             int j = 0; // Initializing j to 0. j will define Y-Axis values on graph.
             ScalarSensorData = M.TimeData1; // Coping data from MainActivity's scalar sensor's HashMap to local HashMap for simplicity.
-            canvas.drawLine(GraphOffset,getHeight()-GraphOffset*2,getWidth()-GraphOffset,getHeight()-GraphOffset*2,AxisColor); // This will draw X-axis on canvas.
-            canvas.drawLine(GraphOffset*2,getHeight()-GraphOffset,GraphOffset*2,GraphOffset*2,AxisColor); // This will draw Y-axis on canvas.
+            canvas.drawLine(GraphOffset,canvas.getHeight()-GraphOffset*2,canvas.getWidth()-GraphOffset,canvas.getHeight()-GraphOffset*2,AxisColor); // This will draw X-axis on canvas.
+            canvas.drawLine(GraphOffset*2,canvas.getHeight()-GraphOffset,GraphOffset*2,GraphOffset*2,AxisColor); // This will draw Y-axis on canvas.
             canvas.drawText("0",GraphOffset+30,XAxisFontYPosition,TextColor); // Text "0" below X & Y axis.
             canvas.drawText("Time Axis (in Seconds)   ->",XAxisFontLabelXPosition,XAxisFontLabelYPosition,TextColor); // Text below X-axis.
             canvas.translate(GraphOffset*2,0); // Translating canvas by offset size to get X-Axis points to proper positions.
@@ -111,12 +111,12 @@ public class CustomView extends View
             }
             canvas.translate(-GraphOffset*2,0); // Restoring back canvas to it's original position.
             XAxisValue1 = GraphOffset*2; // Initializing x-axis to 0 as per graph axis.
-            YAxisValue1 = getHeight()-GraphOffset*2; // Initializing y-axis to 0 as per graph axis.
+            YAxisValue1 = canvas.getHeight()-GraphOffset*2; // Initializing y-axis to 0 as per graph axis.
             if(SensorId == 1) // If sensor is Light Sensor, do as below.
             {
-                canvas.rotate(-90, GraphOffset, getHeight() - getHeight() / 3); // Rotating canvas to rotate Y-axis text by 90 degrees.
-                canvas.drawText("Light sensor values in LUX   ->", 0, getHeight() - getHeight() / 3 - (GraphOffset / 3), TextColor); // Text below Y-axis.
-                canvas.rotate(90, GraphOffset, getHeight() - getHeight() / 3); // Rotating canvas to bring back everything to it's original position.
+                canvas.rotate(-90, GraphOffset, canvas.getHeight() - canvas.getHeight() / 3); // Rotating canvas to rotate Y-axis text by 90 degrees.
+                canvas.drawText("Light sensor values in LUX   ->", 0, canvas.getHeight() - canvas.getHeight() / 3 - (GraphOffset / 3), TextColor); // Text below Y-axis.
+                canvas.rotate(90, GraphOffset, canvas.getHeight() - canvas.getHeight() / 3); // Rotating canvas to bring back everything to it's original position.
                 System.out.println("Light Sensor Values are : " + ScalarSensorData.toString()); // Printing values for debug purpose.
                 j=6; // In case Sensor is Light sensor, divide Y-axis in 6 parts.
             }
@@ -124,9 +124,9 @@ public class CustomView extends View
             {
                 canvas.drawText("Graph will not change unless sensor",GraphOffset*3,GraphOffset*2+GraphOffset/2,TextColor);
                 canvas.drawText("sense value in every second.",GraphOffset*3,GraphOffset*3,TextColor);
-                canvas.rotate(-90,GraphOffset,getHeight()-getHeight()/3); // Rotating canvas to rotate Y-axis text by 90 degrees.
-                canvas.drawText("Proximity sensor values in CM   ->",0,getHeight()-getHeight()/3-(GraphOffset/3),TextColor); // Text below Y-axis.
-                canvas.rotate(90,GraphOffset,getHeight()-getHeight()/3); // Rotating canvas to bring back everything to it's original position.
+                canvas.rotate(-90,GraphOffset,canvas.getHeight()-canvas.getHeight()/3); // Rotating canvas to rotate Y-axis text by 90 degrees.
+                canvas.drawText("Proximity sensor values in CM   ->",0,canvas.getHeight()-canvas.getHeight()/3-(GraphOffset/3),TextColor); // Text below Y-axis.
+                canvas.rotate(90,GraphOffset,canvas.getHeight()-canvas.getHeight()/3); // Rotating canvas to bring back everything to it's original position.
                 System.out.println("Proximity Sensor Values are : "+ScalarSensorData.toString()); // Printing values for debug purpose.
                 j=4; // In case Sensor is Proximity sensor, divide Y-axis in 4 parts.
             }
@@ -178,9 +178,9 @@ public class CustomView extends View
                 {
                     // This is total height of canvas - (height of point from sensor out of max 600 LUX)
                     if(SensorId == 1)
-                        YAxisValue2 = getHeight()-GraphOffset*2-(((getHeight()-GraphOffset*5)*ScalarSensorData.get(Key).get(i))/MaxYAxisValue);
+                        YAxisValue2 = canvas.getHeight()-GraphOffset*2-(((canvas.getHeight()-GraphOffset*5)*ScalarSensorData.get(Key).get(i))/MaxYAxisValue);
                     else if(SensorId == 2)
-                        YAxisValue2 = getHeight()-GraphOffset*2-(((getHeight()-GraphOffset*6)*ScalarSensorData.get(Key).get(i))/MaxYAxisValue);
+                        YAxisValue2 = canvas.getHeight()-GraphOffset*2-(((canvas.getHeight()-GraphOffset*6)*ScalarSensorData.get(Key).get(i))/MaxYAxisValue);
                     canvas.drawLine(XAxisValue1,YAxisValue1,XAxisValue2,YAxisValue2,Color1); // Connecting new points plotted on graph.
                     YAxisValue1 = YAxisValue2; // Assigning y-axis 2nd value to y-axis 1st value so that next line will be continued from where previous line is ended.
                     XAxisValue1 = XAxisValue2; // Assigning x-axis 2nd value to x-axis 1st value so that next line will be continued from where previous line is ended.
@@ -212,9 +212,9 @@ public class CustomView extends View
             VectorSensorDataX = M.TimeData2X; // Coping data from MainActivity's vector sensor's HashMap to local HashMap for simplicity.
             VectorSensorDataY = M.TimeData2Y; // Coping data from MainActivity's vector sensor's HashMap to local HashMap for simplicity.
             VectorSensorDataZ = M.TimeData2Z; // Coping data from MainActivity's vector sensor's HashMap to local HashMap for simplicity.
-            canvas.drawLine(GraphOffset, canvas.getHeight() - canvas.getHeight() / 2, canvas.getWidth() - GraphOffset, getHeight() - getHeight() / 2, AxisColor); // This will draw X-axis on canvas.
+            canvas.drawLine(GraphOffset, canvas.getHeight() - canvas.getHeight() / 2, canvas.getWidth() - GraphOffset, canvas.getHeight() - canvas.getHeight() / 2, AxisColor); // This will draw X-axis on canvas.
             canvas.drawLine(GraphOffset, GraphOffset * 2, GraphOffset, canvas.getHeight() - GraphOffset * 2, AxisColor); // This will draw Y-axis on canvas.
-            canvas.drawText("0", GraphOffset / 2, getHeight() / 2 + 15, TextColor); // Text "0" below X & Y axis.
+            canvas.drawText("0", GraphOffset / 2, canvas.getHeight() / 2 + 15, TextColor); // Text "0" below X & Y axis.
             canvas.drawText("Time Axis (in Seconds)   ->",canvas.getWidth()/3,canvas.getHeight()-GraphOffset*2, TextColor); // Text below X-axis.
             canvas.translate(GraphOffset, 0);
             for (int k = 1; k <= 5; k++) // This is for strokes at every axis points.
@@ -227,9 +227,9 @@ public class CustomView extends View
             }
             canvas.translate(-GraphOffset, 0);
             XAxisValue1 = GraphOffset; // Initializing X-Axis position.
-            YAxisValue1X = getHeight() / 2; // Initializing Y-Axis position.
-            YAxisValue1Y = getHeight() / 2; // Initializing Y-Axis position.
-            YAxisValue1Z = getHeight() / 2; // Initializing Y-Axis position.
+            YAxisValue1X = canvas.getHeight() / 2; // Initializing Y-Axis position.
+            YAxisValue1Y = canvas.getHeight() / 2; // Initializing Y-Axis position.
+            YAxisValue1Z = canvas.getHeight() / 2; // Initializing Y-Axis position.
             int counter = 1; // Setting counter to 1.
             XAxisValue2 = GraphOffset; // Initializing X-Axis position.
             if (VectorSensorDataX.size() > 0)
@@ -256,11 +256,11 @@ public class CustomView extends View
                 XAxisValue2 = XAxisValue2 + ((GraphOffset * 2)/VectorSensorDataX.get(Key).size());
                 for (int i = 0; i < VectorSensorDataX.get(Key).size(); i++)
                 {
-                    YAxisValue2X = (float) (getHeight() / 2 - (((getHeight() / 2 - GraphOffset * 3) * VectorSensorDataX.get(Key).get(i)) / MaxYAxisValue));
+                    YAxisValue2X = (float) (canvas.getHeight() / 2 - (((canvas.getHeight() / 2 - GraphOffset * 3) * VectorSensorDataX.get(Key).get(i)) / MaxYAxisValue));
                     canvas.drawLine(XAxisValue1, YAxisValue1X, XAxisValue2, YAxisValue2X, Color1); // Connecting new points plotted on graph.
-                    YAxisValue2Y = (float) (getHeight() / 2 - (((getHeight() / 2 - GraphOffset * 3) * VectorSensorDataY.get(Key).get(i)) / MaxYAxisValue));
+                    YAxisValue2Y = (float) (canvas.getHeight() / 2 - (((canvas.getHeight() / 2 - GraphOffset * 3) * VectorSensorDataY.get(Key).get(i)) / MaxYAxisValue));
                     canvas.drawLine(XAxisValue1, YAxisValue1Y, XAxisValue2, YAxisValue2Y, Color2); // Connecting new points plotted on graph.
-                    YAxisValue2Z = (float) (getHeight() / 2 - (((getHeight() / 2 - GraphOffset * 3) * VectorSensorDataZ.get(Key).get(i)) / MaxYAxisValue));
+                    YAxisValue2Z = (float) (canvas.getHeight() / 2 - (((canvas.getHeight() / 2 - GraphOffset * 3) * VectorSensorDataZ.get(Key).get(i)) / MaxYAxisValue));
                     canvas.drawLine(XAxisValue1, YAxisValue1Z, XAxisValue2, YAxisValue2Z, Color3); // Connecting new points plotted on graph.
                     YAxisValue1X = YAxisValue2X;
                     YAxisValue1Y = YAxisValue2Y;
@@ -289,15 +289,15 @@ public class CustomView extends View
         }
         else // In case there are no sensors selected, graph will not be shown.
         {
-            canvas.drawLine(GraphOffset,getHeight()-GraphOffset*2,getWidth()-GraphOffset,getHeight()-GraphOffset*2,AxisColor); // This will draw X-axis on canvas.
-            canvas.drawLine(GraphOffset*2,GraphOffset*2,GraphOffset*2,getHeight()-GraphOffset,AxisColor); // This will draw Y-axis on canvas.
-            canvas.drawText("0",GraphOffset+30,getHeight()-GraphOffset-30,TextColor); // Text below X-axis.
-            canvas.drawText("Time Axis (in Seconds)   ->",getWidth()/3,getHeight()-GraphOffset,TextColor); // Text below X-axis.
-            canvas.rotate(-90,GraphOffset,getHeight()-getHeight()/3); // Rotating canvas to rotate Y-axis text by 90 degrees.
-            canvas.drawText("Sensor values on Y-Axis   ->",GraphOffset,getHeight()-getHeight()/3,TextColor); // Text below Y-axis.
-            canvas.rotate(90,GraphOffset,getHeight()-getHeight()/3); // Rotating canvas to bring back everything to it's original position.
-            canvas.drawText("Graph will be displayed here",GraphOffset*4,getHeight()/2-GraphOffset,TextColor); // Message.
-            canvas.drawText("once you start tracing.",GraphOffset*4,getHeight()/2-GraphOffset+40,TextColor); // Message.
+            canvas.drawLine(GraphOffset,canvas.getHeight()-GraphOffset*2,canvas.getWidth()-GraphOffset,canvas.getHeight()-GraphOffset*2,AxisColor); // This will draw X-axis on canvas.
+            canvas.drawLine(GraphOffset*2,GraphOffset*2,GraphOffset*2,canvas.getHeight()-GraphOffset,AxisColor); // This will draw Y-axis on canvas.
+            canvas.drawText("0",GraphOffset+30,canvas.getHeight()-GraphOffset-30,TextColor); // Text below X-axis.
+            canvas.drawText("Time Axis (in Seconds)   ->",canvas.getWidth()/3,canvas.getHeight()-GraphOffset,TextColor); // Text below X-axis.
+            canvas.rotate(-90,GraphOffset,canvas.getHeight()-canvas.getHeight()/3); // Rotating canvas to rotate Y-axis text by 90 degrees.
+            canvas.drawText("Sensor values on Y-Axis   ->",GraphOffset,canvas.getHeight()-canvas.getHeight()/3,TextColor); // Text below Y-axis.
+            canvas.rotate(90,GraphOffset,canvas.getHeight()-canvas.getHeight()/3); // Rotating canvas to bring back everything to it's original position.
+            canvas.drawText("Graph will be displayed here",GraphOffset*4,canvas.getHeight()/2-GraphOffset,TextColor); // Message.
+            canvas.drawText("once you start tracing.",GraphOffset*4,canvas.getHeight()/2-GraphOffset+40,TextColor); // Message.
             System.out.println("No Sensors are selected.");
             postInvalidateDelayed(1000);
         }
