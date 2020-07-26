@@ -214,9 +214,15 @@ public class CustomView extends View
             VectorSensorDataZ = M.TimeData2Z; // Coping data from MainActivity's vector sensor's HashMap to local HashMap for simplicity.
             canvas.drawLine(GraphOffset, canvas.getHeight() - canvas.getHeight() / 2, canvas.getWidth() - GraphOffset, canvas.getHeight() - canvas.getHeight() / 2, AxisColor); // This will draw X-axis on canvas.
             canvas.drawLine(GraphOffset, GraphOffset * 2, GraphOffset, canvas.getHeight() - GraphOffset * 2, AxisColor); // This will draw Y-axis on canvas.
-            canvas.drawText("0", GraphOffset / 2, canvas.getHeight() / 2 + 15, TextColor); // Text "0" below X & Y axis.
+            canvas.drawText("0.0", GraphOffset+7, canvas.getHeight()/2+GraphOffset/2, TextColor); // Text "0" below X & Y axis.
             canvas.drawText("Time Axis (in Seconds)   ->",canvas.getWidth()/3,canvas.getHeight()-GraphOffset*2, TextColor); // Text below X-axis.
             canvas.translate(GraphOffset, 0);
+            canvas.rotate(-90, GraphOffset, canvas.getHeight() - canvas.getHeight() / 3); // Rotating canvas to rotate Y-axis text by 90 degrees.
+            if(SensorId == 3)
+                canvas.drawText("Gyroscope values in Rad/s ->", 0, canvas.getHeight()/2+GraphOffset, TextColor); // Text below Y-axis.
+            else if(SensorId == 4)
+                canvas.drawText("Linear Acceleration values in G ->", 0, canvas.getHeight()/2+GraphOffset, TextColor); // Text below Y-axis.
+            canvas.rotate(90, GraphOffset, canvas.getHeight() - canvas.getHeight() / 3); // Rotating canvas to bring back everything to it's original position.
             for (int k = 1; k <= 5; k++) // This is for strokes at every axis points.
             {
                 canvas.drawLine(k * GraphOffset * 2, canvas.getHeight() / 2 - 10, k * GraphOffset * 2, canvas.getHeight() / 2 + 10, AxisColor);

@@ -1,4 +1,4 @@
-package com.example.telemetry_traces;
+ package com.example.telemetry_traces;
 
 import android.content.Context;
 import android.graphics.Color;
